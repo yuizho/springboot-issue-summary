@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component()
+@Component("IssuesAPI")
 public class IssuesApiClient extends AbstractApiClient implements IssuesFetcher {
     private static final String uri = "https://api.github.com/repos/spring-projects/spring-boot/issues?page=1&per_page=10";
 

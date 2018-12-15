@@ -1,17 +1,24 @@
 package io.github.yuizho.springbootissuesummary.application.services;
 
+import io.github.yuizho.springbootissuesummary.infrastructure.DataSourceProperties;
 import io.github.yuizho.springbootissuesummary.domain.adopters.IssuesFetcher;
 import io.github.yuizho.springbootissuesummary.domain.collections.Issues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+import java.util.Map;
+
+@Service()
 public class IssuesService {
+    // https://qiita.com/gagagaga_dev/items/c16e5b6b3dff6df7e406
     @Autowired
-    private IssuesFetcher issuesFetcher;
+    private Map<String, IssuesFetcher> issuesFetchers;
+
+    @Autowired
+    private DataSourceProperties dataSourceProperties;
 
     // TODO: キャッシュから取るようにする
     public Issues fetchIssues() {
-        return issuesFetcher.fetchIssues();
+        return issuesFetchers.get(IssuesFetcher.DOMAIN_NAME + dataSourceProperties.getType()).fetchIssues();
     }
 }
