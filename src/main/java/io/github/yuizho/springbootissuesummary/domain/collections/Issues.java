@@ -1,13 +1,11 @@
 package io.github.yuizho.springbootissuesummary.domain.collections;
 
 import io.github.yuizho.springbootissuesummary.domain.models.Issue;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
 public class Issues {
     private final List<Issue> issues;
 
