@@ -1,8 +1,9 @@
-package io.github.yuizho.springbootissuesummary.infrastructure.rest;
+package io.github.yuizho.springbootissuesummary.infrastructure.rest.adopters;
 
 import io.github.yuizho.springbootissuesummary.domain.adopters.IssuesFetcher;
 import io.github.yuizho.springbootissuesummary.domain.models.Issue;
 import io.github.yuizho.springbootissuesummary.domain.collections.Issues;
+import io.github.yuizho.springbootissuesummary.infrastructure.rest.RestApiClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

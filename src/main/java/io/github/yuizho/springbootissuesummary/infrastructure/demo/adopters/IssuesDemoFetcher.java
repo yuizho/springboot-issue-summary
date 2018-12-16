@@ -1,4 +1,4 @@
-package io.github.yuizho.springbootissuesummary.infrastructure.demo;
+package io.github.yuizho.springbootissuesummary.infrastructure.demo.adopters;
 
 import io.github.yuizho.springbootissuesummary.domain.adopters.IssuesFetcher;
 import io.github.yuizho.springbootissuesummary.domain.collections.Issues;
