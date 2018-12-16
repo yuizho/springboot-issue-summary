@@ -1,10 +1,11 @@
-package io.github.yuizho.springbootissuesummary.infrastructure.api;
+package io.github.yuizho.springbootissuesummary.infrastructure.rest;
 
 import io.github.yuizho.springbootissuesummary.domain.adopters.IssuesFetcher;
 import io.github.yuizho.springbootissuesummary.domain.models.Issue;
 import io.github.yuizho.springbootissuesummary.domain.collections.Issues;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -14,14 +15,17 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component("IssuesAPI")
-public class IssuesApiClient extends AbstractApiClient implements IssuesFetcher {
-    private static final String uri = "https://api.github.com/repos/spring-projects/spring-boot/issues?page=1&per_page=10";
+@Component("IssuesREST")
+public class IssuesRestFetcher implements IssuesFetcher {
+    private static final String ISSUES_URI = "https://api.github.com/repos/spring-projects/spring-boot/issues?page=1&per_page=10";
+
+    @Autowired
+    private RestApiClient apiClient;
 
     @Cacheable(value = "issues")
     @Override
     public Issues fetchIssues() {
-        HttpResponse<String> response = fetch();
+        HttpResponse<String> response = apiClient.get(URI.create(ISSUES_URI));
         return convertResultToDomain(response.body());
     }
 
@@ -37,10 +41,5 @@ public class IssuesApiClient extends AbstractApiClient implements IssuesFetcher 
                     jsonObj.getString("body")));
         });
         return new Issues(issues);
-    }
-
-    @Override
-    URI getURI() {
-        return URI.create(uri);
     }
 }
