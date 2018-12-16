@@ -28,5 +28,6 @@ dependencies {
 	implementation('org.apache.commons:commons-lang3:3.8.1')
 	implementation('org.json:json:20180813')
 	implementation('org.springframework.boot:spring-boot-starter-web')
+	implementation('org.springframework.boot:spring-boot-starter-cache')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
