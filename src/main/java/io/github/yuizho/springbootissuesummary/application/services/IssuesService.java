@@ -17,8 +17,9 @@ public class IssuesService {
     @Autowired
     private DataSourceProperties dataSourceProperties;
 
-    // TODO: キャッシュから取るようにする
     public Issues fetchIssues() {
-        return issuesFetchers.get(IssuesFetcher.DOMAIN_NAME + dataSourceProperties.getType()).fetchIssues();
+        String targetComponentName
+                = IssuesFetcher.DOMAIN_NAME + dataSourceProperties.getType();
+        return issuesFetchers.get(targetComponentName).fetchIssues();
     }
 }
