@@ -1,6 +1,7 @@
 package io.github.yuizho.springbootissuesummary.infrastructure.rest.adopters;
 
 import io.github.yuizho.springbootissuesummary.domain.adopters.IssuesFetcher;
+import io.github.yuizho.springbootissuesummary.domain.exceptions.SystemException;
 import io.github.yuizho.springbootissuesummary.domain.models.Issue;
 import io.github.yuizho.springbootissuesummary.domain.collections.Issues;
 import io.github.yuizho.springbootissuesummary.infrastructure.rest.RestApiClient;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -25,8 +27,12 @@ public class IssuesRestFetcher implements IssuesFetcher {
     @Cacheable(value = DOMAIN_NAME)
     @Override
     public Issues fetchIssues() {
-        HttpResponse<String> response = apiClient.get(URI.create(ISSUES_URI));
-        return convertResultToDomain(response.body());
+        try {
+            HttpResponse<String> response = apiClient.get(URI.create(ISSUES_URI));
+            return convertResultToDomain(response.body());
+        } catch (IOException | InterruptedException ex) {
+            throw new SystemException("Some kind of communication with external service was failed.", ex);
+        }
     }
 
     Issues convertResultToDomain(String body) {

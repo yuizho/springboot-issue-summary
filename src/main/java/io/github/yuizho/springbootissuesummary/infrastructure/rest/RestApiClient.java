@@ -1,5 +1,7 @@
 package io.github.yuizho.springbootissuesummary.infrastructure.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -17,34 +19,42 @@ import java.time.Duration;
  */
 @Component
 public class RestApiClient {
-    public HttpResponse<String> get(URI uri) {
+    private final Logger logger = LoggerFactory.getLogger(RestApiClient.class);
+
+    public HttpResponse<String> get(URI uri)
+            throws IOException, InterruptedException {
         return sendNobodyRequest(uri, "GET");
     }
 
-    public HttpResponse<String> delete(URI uri) {
+    public HttpResponse<String> delete(URI uri)
+            throws IOException, InterruptedException {
         return sendNobodyRequest(uri, "DELETE");
     }
 
-    public HttpResponse<String> post(URI uri, HttpRequest.BodyPublisher bodyPublisher) {
+    public HttpResponse<String> post(URI uri, HttpRequest.BodyPublisher bodyPublisher)
+            throws IOException, InterruptedException {
         return sendRequest(uri, "POST", bodyPublisher);
     }
 
-    public HttpResponse<String> put(URI uri, HttpRequest.BodyPublisher bodyPublisher) {
+    public HttpResponse<String> put(URI uri, HttpRequest.BodyPublisher bodyPublisher)
+            throws IOException, InterruptedException {
         return sendRequest(uri, "PUT", bodyPublisher);
     }
 
-    protected HttpResponse<String> sendNobodyRequest(URI uri, String method) {
+    protected HttpResponse<String> sendNobodyRequest(URI uri, String method)
+            throws IOException, InterruptedException {
         HttpClient client = getHttpClient();
         HttpRequest request = getHttpRequest(uri, method, HttpRequest.BodyPublishers.noBody());
         return send(client, request);
     }
 
-    protected HttpResponse<String> sendRequest(URI uri, String method, HttpRequest.BodyPublisher bodyPublisher) {
+    protected HttpResponse<String> sendRequest(URI uri, String method, HttpRequest.BodyPublisher bodyPublisher)
+            throws IOException, InterruptedException {
         HttpClient client = getHttpClient();
         HttpRequest request = getHttpRequest(uri, method, bodyPublisher);
         return send(client, request);
     }
-    
+
     /**
      * Create HttpClient object of Java 11 Http Client.
      * If you want to change Http protocol version or proxy configuration,
@@ -71,20 +81,17 @@ public class RestApiClient {
                 .build();
     }
 
-    protected HttpResponse<String> send(HttpClient client, HttpRequest request) {
-        try {
-            // TODO: request, responseをログ出力する
-            HttpResponse<String> result
-                    = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (!isOK(result.statusCode())) {
-                throw new IOException(
-                        String.format("the status code responded by external API is %d.", result.statusCode()));
-            }
-            return result;
-        } catch (IOException | InterruptedException e) {
-            // TODO: まともにエラー処理する
-            throw new RuntimeException(e);
+    protected HttpResponse<String> send(HttpClient client, HttpRequest request)
+            throws IOException, InterruptedException {
+        logger.info(request.toString());
+        HttpResponse<String> result
+                = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (!isOK(result.statusCode())) {
+            throw new IOException(
+                    String.format("the status code responded by external API is %d.", result.statusCode()));
         }
+        logger.info(result.toString());
+        return result;
     }
 
     /**
