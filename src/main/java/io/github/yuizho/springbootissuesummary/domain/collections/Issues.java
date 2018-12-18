@@ -33,7 +33,7 @@ public class Issues {
         return Collections.unmodifiableList(issues);
     }
 
-    public List<Issue> asUnmodifiableList(OptionalInt optPage, OptionalInt optPerPage) {
+    public List<Issue> asUnmodifiableList(Optional<Integer> optPage, Optional<Integer> optPerPage) {
         int page = optPage.orElse(1);
         int perPage = optPerPage.orElse(DEFAULT_PER_PAGE);
         if (page <= 0 || perPage <= 0) {
