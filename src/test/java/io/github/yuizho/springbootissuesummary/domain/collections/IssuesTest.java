@@ -94,6 +94,36 @@ class IssuesTest {
     }
 
     @Test
+    void hasNextFieldIsSetCorrectlyWhenPagingMethodIsUsed() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6")
+        );
+
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(3)).isHasNext())
+                .isEqualTo(true);
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.of(3)).isHasNext())
+                .isEqualTo(false);
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(1)).isHasNext())
+                .isEqualTo(true);
+        assertThat(new Issues(list).asPaginated(Optional.of(6), Optional.of(1)).isHasNext())
+                .isEqualTo(false);
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(6)).isHasNext())
+                .isEqualTo(false);
+        // tailが実リスト数より大きいケース
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(7)).isHasNext())
+                .isEqualTo(false);
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(1000)).isHasNext())
+                .isEqualTo(false);
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.of(4)).isHasNext())
+                .isEqualTo(false);
+    }
+
+    @Test
     void pagingWorksCorrectlyWhenPageJustFilled() {
         var list = List.of(
                 new Issue("title1", "title1"),

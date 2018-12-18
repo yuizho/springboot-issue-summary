@@ -11,7 +11,6 @@ public class Issues {
 
     private final boolean hasNext;
 
-    // TODO: propertiesが良いかも。
     private static final int DEFAULT_PER_PAGE = 10;
 
     public Issues() {
@@ -60,16 +59,24 @@ public class Issues {
         }
         int listLength = issues.size();
 
-        int head = (page - 1) * perPage;
+        int head = computeHeadIndex(page, perPage);
         if (listLength <= head) {
             return new Issues(new ArrayList<>());
         }
+        int tail = computeTailIndex(page, perPage, listLength);
 
+        return new Issues(issues.subList(head, tail), tail < listLength);
+    }
+
+    private int computeHeadIndex(int page, int perPage) {
+        return (page - 1) * perPage;
+    }
+
+    private int computeTailIndex(int page, int perPage, int listLength) {
         int tail = page * perPage;
         if (listLength < tail) {
             tail = listLength;
         }
-
-        return new Issues(issues.subList(head, tail), tail != listLength);
+        return tail;
     }
 }

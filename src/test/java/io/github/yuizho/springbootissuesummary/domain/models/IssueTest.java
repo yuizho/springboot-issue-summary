@@ -21,14 +21,22 @@ public class IssueTest {
     @Test
     public void titleAndBodyExceedMaxLength() {
         var issues = new Issue("12345678901", "1234567890123456789012345678901");
-        assertThat(issues.getTitle()).isEqualTo("1234567890");
-        assertThat(issues.getBody()).isEqualTo("123456789012345678901234567890");
+        assertThat(issues.getTitle())
+                .hasSize(10)
+                .isEqualTo("1234567890");
+        assertThat(issues.getBody())
+                .hasSize(30)
+                .isEqualTo("123456789012345678901234567890");
     }
 
     @Test
     public void titleAndBodyis2byteChar() {
         var issues = new Issue("あいうえおあいうえおあ", "あいうえおあいうえおあいうえおあいうえおあいうえおあいうえおあ");
-        assertThat(issues.getTitle()).isEqualTo("あいうえおあいうえお");
-        assertThat(issues.getBody()).isEqualTo("あいうえおあいうえおあいうえおあいうえおあいうえおあいうえお");
+        assertThat(issues.getTitle())
+                .hasSize(10)
+                .isEqualTo("あいうえおあいうえお");
+        assertThat(issues.getBody())
+                .hasSize(30)
+                .isEqualTo("あいうえおあいうえおあいうえおあいうえおあいうえおあいうえお");
     }
 }

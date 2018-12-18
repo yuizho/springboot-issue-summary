@@ -37,6 +37,7 @@ public class IssuesRestCacheJob implements CacheJob {
                 return;
             }
             issuesCache.clear();
+            // get IssuesRestFetcher
             Issues issues= issuesFetchers.get(IssuesFetcher.DOMAIN_NAME + DATA_SOURCE_TYPE_REST).fetchIssues();
             issuesCache.put(SimpleKey.EMPTY, issues);
         }

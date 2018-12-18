@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Service()
 public class IssuesService {
+    // I referenced this page to inject with condition.
     // https://qiita.com/gagagaga_dev/items/c16e5b6b3dff6df7e406
     @Autowired
     private Map<String, IssuesFetcher> issuesFetchers;
