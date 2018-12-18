@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service()
 public class IssuesService {
@@ -17,9 +18,9 @@ public class IssuesService {
     @Autowired
     private DataSourceProperties dataSourceProperties;
 
-    public Issues fetchIssues() {
+    public Issues fetchIssues(Optional<Integer> optPage, Optional<Integer> optPerPage) {
         String targetComponentName
                 = IssuesFetcher.DOMAIN_NAME + dataSourceProperties.getType();
-        return issuesFetchers.get(targetComponentName).fetchIssues();
+        return issuesFetchers.get(targetComponentName).fetchIssues().asPaginated(optPage, optPerPage);
     }
 }

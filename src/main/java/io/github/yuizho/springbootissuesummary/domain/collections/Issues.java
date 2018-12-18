@@ -6,21 +6,36 @@ import io.github.yuizho.springbootissuesummary.domain.models.Issue;
 import java.util.*;
 
 public class Issues {
+
     private final List<Issue> issues;
 
-    // TOOD: propertiesが良いかも。
+    private final boolean hasNext;
+
+    // TODO: propertiesが良いかも。
     private static final int DEFAULT_PER_PAGE = 10;
 
     public Issues() {
         this.issues = new ArrayList<>();
+        this.hasNext = false;
     }
 
     public Issues(List<Issue> issues) {
+        this.hasNext = false;
         if (issues == null) {
             this.issues = new ArrayList<>();
             return;
         }
         this.issues = issues;
+    }
+
+    public Issues(List<Issue> issues, boolean hasNext) {
+        if (issues == null) {
+            this.issues = new ArrayList<>();
+            this.hasNext = false;
+            return;
+        }
+        this.issues = issues;
+        this.hasNext = hasNext;
     }
 
     public Issues add(Issue issue) {
@@ -29,11 +44,15 @@ public class Issues {
         return new Issues(tmpIssues);
     }
 
-    public List<Issue> asUnmodifiableList() {
+    public List<Issue> getIssues() {
         return Collections.unmodifiableList(issues);
     }
 
-    public List<Issue> asUnmodifiableList(Optional<Integer> optPage, Optional<Integer> optPerPage) {
+    public boolean isHasNext() {
+        return hasNext;
+    }
+
+    public Issues asPaginated(Optional<Integer> optPage, Optional<Integer> optPerPage) {
         int page = optPage.orElse(1);
         int perPage = optPerPage.orElse(DEFAULT_PER_PAGE);
         if (page <= 0 || perPage <= 0) {
@@ -43,13 +62,14 @@ public class Issues {
 
         int head = (page - 1) * perPage;
         if (listLength <= head) {
-            return Collections.unmodifiableList(new ArrayList<>());
+            return new Issues(new ArrayList<>());
         }
 
         int tail = page * perPage;
         if (listLength < tail) {
             tail = listLength;
         }
-        return Collections.unmodifiableList(issues.subList(head, tail));
+
+        return new Issues(issues.subList(head, tail), tail != listLength);
     }
 }

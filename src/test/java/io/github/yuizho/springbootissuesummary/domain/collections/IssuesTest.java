@@ -18,13 +18,13 @@ class IssuesTest {
 
         var issue1 = new Issue("title1", "body1");
         var issues1 = issues.add(issue1);
-        assertThat(issues1.asUnmodifiableList())
+        assertThat(issues1.getIssues())
                 .hasSize(1)
                 .containsExactly(issue1);
 
         var issue2 = new Issue("title2", "body2");
         var issues2 = issues1.add(issue2);
-        assertThat(issues2.asUnmodifiableList())
+        assertThat(issues2.getIssues())
                 .hasSize(2)
                 .containsExactly(issue1, issue2);
     }
@@ -40,7 +40,7 @@ class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList())
+        assertThat(new Issues(list).getIssues())
                 .hasSize(6)
                 .containsExactly(
                         list.get(0),
@@ -63,32 +63,32 @@ class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(3)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(3)).getIssues())
                 .hasSize(3)
                 .containsExactly(list.get(0), list.get(1), list.get(2));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(2), Optional.of(3)))
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.of(3)).getIssues())
                 .hasSize(3)
                 .containsExactly(list.get(3), list.get(4), list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(1)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(1)).getIssues())
                 .hasSize(1)
                 .containsExactly(list.get(0));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(6), Optional.of(1)))
+        assertThat(new Issues(list).asPaginated(Optional.of(6), Optional.of(1)).getIssues())
                 .hasSize(1)
                 .containsExactly(list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(6)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(6)).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
         // tailが実リスト数より大きい場合は、返せる分だけ返す
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(7)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(7)).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(1000)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(1000)).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(2), Optional.of(4)))
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.of(4)).getIssues())
                 .hasSize(2)
                 .containsExactly(list.get(4), list.get(5));
     }
@@ -104,17 +104,17 @@ class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.empty(), Optional.of(3)))
+        assertThat(new Issues(list).asPaginated(Optional.empty(), Optional.of(3)).getIssues())
                 .hasSize(3)
                 .containsExactly(list.get(0), list.get(1), list.get(2));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.empty(), Optional.of(1)))
+        assertThat(new Issues(list).asPaginated(Optional.empty(), Optional.of(1)).getIssues())
                 .hasSize(1)
                 .containsExactly(list.get(0));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.empty(), Optional.of(6)))
+        assertThat(new Issues(list).asPaginated(Optional.empty(), Optional.of(6)).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.empty(), Optional.of(7)))
+        assertThat(new Issues(list).asPaginated(Optional.empty(), Optional.of(7)).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
@@ -138,12 +138,12 @@ class IssuesTest {
                 new Issue("title13", "title13")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.empty()))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.empty()).getIssues())
                 .hasSize(10)
                 .containsExactly(list.get(0), list.get(1), list.get(2), list.get(3),
                         list.get(4), list.get(5), list.get(6), list.get(7),
                         list.get(8), list.get(9));
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(2), Optional.empty()))
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.empty()).getIssues())
                 .hasSize(3)
                 .containsExactly(list.get(10), list.get(11), list.get(12));
     }
@@ -159,7 +159,7 @@ class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.empty()))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.empty()).getIssues())
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2), list.get(3),
                         list.get(4), list.get(5));
@@ -169,9 +169,9 @@ class IssuesTest {
     void pagingReturnsEmptyListWhenIssuesIsEmpty() {
         var list = new ArrayList<Issue>();
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.empty()))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.empty()).getIssues())
                 .hasSize(0);
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(1)))
+        assertThat(new Issues(list).asPaginated(Optional.of(1), Optional.of(1)).getIssues())
                 .hasSize(0);
     }
 
@@ -193,9 +193,9 @@ class IssuesTest {
                 new Issue("title13", "title13")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(2), Optional.of(13)))
+        assertThat(new Issues(list).asPaginated(Optional.of(2), Optional.of(13)).getIssues())
                 .hasSize(0);
-        assertThat(new Issues(list).asUnmodifiableList(Optional.of(3), Optional.empty()))
+        assertThat(new Issues(list).asPaginated(Optional.of(3), Optional.empty()).getIssues())
                 .hasSize(0);
     }
 
@@ -210,19 +210,19 @@ class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(Optional.of(0), Optional.of(10)))
+        assertThatThrownBy(() -> new Issues(list).asPaginated(Optional.of(0), Optional.of(10)).getIssues())
                 .isInstanceOfSatisfying(SystemException.class, e -> {
                    assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
                 });
-        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(Optional.of(-1), Optional.empty()))
+        assertThatThrownBy(() -> new Issues(list).asPaginated(Optional.of(-1), Optional.empty()).getIssues())
                 .isInstanceOfSatisfying(SystemException.class, e -> {
                     assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
                 });
-        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(Optional.of(1), Optional.of(0)))
+        assertThatThrownBy(() -> new Issues(list).asPaginated(Optional.of(1), Optional.of(0)).getIssues())
                 .isInstanceOfSatisfying(SystemException.class, e -> {
                     assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
                 });
-        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(Optional.empty(), Optional.of(-1)))
+        assertThatThrownBy(() -> new Issues(list).asPaginated(Optional.empty(), Optional.of(-1)).getIssues())
                 .isInstanceOfSatisfying(SystemException.class, e -> {
                     assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
                 });
