@@ -19,7 +19,8 @@ import java.util.List;
 
 @Component("IssuesREST")
 public class IssuesRestFetcher implements IssuesFetcher {
-    private static final String ISSUES_URI = "https://api.github.com/repos/spring-projects/spring-boot/issues?page=1&per_page=10";
+    private static final String ISSUES_URI
+            = "https://api.github.com/repos/spring-projects/spring-boot/issues?page=1&per_page=100";
 
     @Autowired
     private RestApiClient apiClient;
@@ -40,8 +41,8 @@ public class IssuesRestFetcher implements IssuesFetcher {
         List<Issue> issues = new ArrayList<>();
         jsonArray.forEach(item -> {
             JSONObject jsonObj = (JSONObject) item;
-            issues.add(new Issue(jsonObj.getString("title"),
-                    jsonObj.getString("body")));
+            issues.add(new Issue(jsonObj.optString("title"),
+                    jsonObj.optString("body")));
         });
         return new Issues(issues);
     }
