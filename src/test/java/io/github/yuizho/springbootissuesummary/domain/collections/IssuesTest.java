@@ -1,15 +1,19 @@
 package io.github.yuizho.springbootissuesummary.domain.collections;
 
+import io.github.yuizho.springbootissuesummary.domain.exceptions.SystemException;
 import io.github.yuizho.springbootissuesummary.domain.models.Issue;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
-public class IssuesTest {
+class IssuesTest {
     @Test
-    public void addWorksCorrectly() {
+    void addWorksCorrectly() {
         var issues = new Issues();
 
         var issue1 = new Issue("title1", "body1");
@@ -26,7 +30,7 @@ public class IssuesTest {
     }
 
     @Test
-    public void constructorWithListWorksCorrectly() {
+    void constructorWithListWorksCorrectly() {
         var list = List.of(
                 new Issue("title1", "title1"),
                 new Issue("title2", "title2"),
@@ -49,7 +53,7 @@ public class IssuesTest {
     }
 
     @Test
-    public void pagingWorksCorrectly() {
+    void pagingWorksCorrectlyWhenBothParametersFilled() {
         var list = List.of(
                 new Issue("title1", "title1"),
                 new Issue("title2", "title2"),
@@ -59,32 +63,169 @@ public class IssuesTest {
                 new Issue("title6", "title6")
         );
 
-        assertThat(new Issues(list).asUnmodifiableList(1, 3))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(3)))
                 .hasSize(3)
                 .containsExactly(list.get(0), list.get(1), list.get(2));
-        assertThat(new Issues(list).asUnmodifiableList(2, 3))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(2), OptionalInt.of(3)))
                 .hasSize(3)
                 .containsExactly(list.get(3), list.get(4), list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(1, 1))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(1)))
                 .hasSize(1)
                 .containsExactly(list.get(0));
-        assertThat(new Issues(list).asUnmodifiableList(6, 1))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(6), OptionalInt.of(1)))
                 .hasSize(1)
                 .containsExactly(list.get(5));
-        assertThat(new Issues(list).asUnmodifiableList(1, 6))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(6)))
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
-        // tailが実リスト数寄り大きい場合は、返せる分だけ返す
-        assertThat(new Issues(list).asUnmodifiableList(1, 7))
+        // tailが実リスト数より大きい場合は、返せる分だけ返す
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(7)))
                 .hasSize(6)
                 .containsExactly(list.get(0), list.get(1), list.get(2),
                         list.get(3), list.get(4), list.get(5));
-        // tailが実リスト数寄り大きい場合は、返せる分だけ返す
-        assertThat(new Issues(list).asUnmodifiableList(2, 4))
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(1000)))
+                .hasSize(6)
+                .containsExactly(list.get(0), list.get(1), list.get(2),
+                        list.get(3), list.get(4), list.get(5));
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(2), OptionalInt.of(4)))
                 .hasSize(2)
                 .containsExactly(list.get(4), list.get(5));
     }
 
-    // TODO: エラーケースのテストを実装
+    @Test
+    void pagingWorksCorrectlyWhenPageJustFilled() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6")
+        );
+
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.empty(), OptionalInt.of(3)))
+                .hasSize(3)
+                .containsExactly(list.get(0), list.get(1), list.get(2));
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.empty(), OptionalInt.of(1)))
+                .hasSize(1)
+                .containsExactly(list.get(0));
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.empty(), OptionalInt.of(6)))
+                .hasSize(6)
+                .containsExactly(list.get(0), list.get(1), list.get(2),
+                        list.get(3), list.get(4), list.get(5));
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.empty(), OptionalInt.of(7)))
+                .hasSize(6)
+                .containsExactly(list.get(0), list.get(1), list.get(2),
+                        list.get(3), list.get(4), list.get(5));
+    }
+
+    @Test
+    void pagingWorksCorrectlyWhenPerPageJustFilledAndListHasOver10Items() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6"),
+                new Issue("title7", "title7"),
+                new Issue("title8", "title8"),
+                new Issue("title9", "title9"),
+                new Issue("title10", "title10"),
+                new Issue("title11", "title11"),
+                new Issue("title12", "title12"),
+                new Issue("title13", "title13")
+        );
+
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.empty()))
+                .hasSize(10)
+                .containsExactly(list.get(0), list.get(1), list.get(2), list.get(3),
+                        list.get(4), list.get(5), list.get(6), list.get(7),
+                        list.get(8), list.get(9));
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(2), OptionalInt.empty()))
+                .hasSize(3)
+                .containsExactly(list.get(10), list.get(11), list.get(12));
+    }
+
+    @Test
+    void pagingWorksCorrectlyWhenPerPageJustFilledAndListHasLessThan10Items() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6")
+        );
+
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.empty()))
+                .hasSize(6)
+                .containsExactly(list.get(0), list.get(1), list.get(2), list.get(3),
+                        list.get(4), list.get(5));
+    }
+
+    @Test
+    void pagingReturnsEmptyListWhenIssuesIsEmpty() {
+        var list = new ArrayList<Issue>();
+
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.empty()))
+                .hasSize(0);
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(1)))
+                .hasSize(0);
+    }
+
+    @Test
+    void pagingReturnsEmptyListWhenSpecifiedStartIndexOfRangeExceedsList() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6"),
+                new Issue("title7", "title7"),
+                new Issue("title8", "title8"),
+                new Issue("title9", "title9"),
+                new Issue("title10", "title10"),
+                new Issue("title11", "title11"),
+                new Issue("title12", "title12"),
+                new Issue("title13", "title13")
+        );
+
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(2), OptionalInt.of(13)))
+                .hasSize(0);
+        assertThat(new Issues(list).asUnmodifiableList(OptionalInt.of(3), OptionalInt.empty()))
+                .hasSize(0);
+    }
+
+    @Test
+    void pagingThrowsExceptionWhenZeroOrMinusValueIsSetToParameter() {
+        var list = List.of(
+                new Issue("title1", "title1"),
+                new Issue("title2", "title2"),
+                new Issue("title3", "title3"),
+                new Issue("title4", "title4"),
+                new Issue("title5", "title5"),
+                new Issue("title6", "title6")
+        );
+
+        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(OptionalInt.of(0), OptionalInt.of(10)))
+                .isInstanceOfSatisfying(SystemException.class, e -> {
+                   assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
+                });
+        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(OptionalInt.of(-1), OptionalInt.empty()))
+                .isInstanceOfSatisfying(SystemException.class, e -> {
+                    assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
+                });
+        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(OptionalInt.of(1), OptionalInt.of(0)))
+                .isInstanceOfSatisfying(SystemException.class, e -> {
+                    assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
+                });
+        assertThatThrownBy(() -> new Issues(list).asUnmodifiableList(OptionalInt.empty(), OptionalInt.of(-1)))
+                .isInstanceOfSatisfying(SystemException.class, e -> {
+                    assertThat(e.getMessage()).isEqualTo("0 or minus value was set to pagination parameter. probably some validation of controller is not enough.");
+                });
+
+    }
 }
