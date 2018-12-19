@@ -1,0 +1,34 @@
+@startuml
+package application {
+  class IssuesController
+  class IssuesService
+}
+note right of IssuesService : IssuesFetcher経由で\nIssuesオブジェクトを取得する
+
+package domain {
+  interface IssuesFetcher {
+    Issues fetchIssues()
+  }
+  class Issues
+  class Issue
+}
+
+package infrastructure {
+  class IssuesRestFetcher {
+    Issues fetchIssues()
+  }
+  class IssuesXXXFetcher {
+    Issues fetchIssues()
+  }
+  class RestApiClient
+}
+client ()-- IssuesController
+IssuesController o-- IssuesService
+Issues <.. IssuesService: use
+IssuesService o-- IssuesFetcher
+IssuesFetcher <|-- IssuesRestFetcher
+IssuesFetcher <|-- IssuesXXXFetcher
+IssuesRestFetcher o-- RestApiClient
+GitHubAPI ()- RestApiClient
+Issues o-- Issue
+@enduml
