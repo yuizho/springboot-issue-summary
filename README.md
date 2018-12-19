@@ -7,10 +7,12 @@
 Dockerが使用できる環境で実行してください。
 
 ## サーバの起動
-以下のコマンドを実行して、Dockerコンテナ上でJavaのサーバを起動してくだい。
+以下のコマンドを実行して、Dockerコンテナ上でJavaのサーバを起動してください。
+
+※docker image`yuizho/springboot-issue-summary`はDocker Hub(https://cloud.docker.com/repository/docker/yuizho/springboot-issue-summary)へpush済みのものです。
 
 ```bash
-TODO: docker image pullしてサーバを起動するコマンドを書く
+docker run -it --rm -p 8080:8080 yuizho/springboot-issue-summary
 ```
 
 ## 動作確認
@@ -94,7 +96,7 @@ DDD(ドメイン駆動設計)の考え方を取り入れて、クラス設計を
 アプリケーションレイヤーはIssuesFetcherインターフェースを参照しているだけなので、どのデータソースから情報が取得されるのかは知らずにIssuesオブジェクトを取得できるようになっています。
 
 
-### プロパティファイルで取得するデータソースを分けられるようにした。
+### プロパティファイルで取得するデータソースを分けられるようにした
 application.propertiesファイル内の`data.source.type`の設定を変えることでデータソースを切り替えられるようにしました。
 現在有効な設定は以下の2つです。
 * `REST`: REST APIをデータソースとします。Issuesのデータ取得クラスとしてIssuesRestFetcherが使用され、GitHub APIからデータを取得します。
@@ -133,21 +135,23 @@ public class IssuesService {
 
 ### GitHub APIの返却値をキャッシュするようにした
 Spring BootのCache機能を使用し、データソースがREST(GitHub API)の場合に3分ごとにGitHub APIへアクセスし、結果をキャッシュするIssuesRestCacheJobクラスを作成しました。
+
 これによって、3分間最新の状態が取得出来ないものの、ローカルの環境であれば20ミリ秒程度で結果を取得できるようになっています。
 また、基本的にGitHub APIのRate limiting(1時間ごとに60アクセスまで)の影響も受けずに情報を取得出来ます。
 
-現在はデフォルト設定でSpring BootのCache機能を使用しているため、ConcurrentHashMap内にキャッシュが保持されます。
-スケーラビリティなどもう少し実運用を意識する場合には、Redisなどにキャッシュしたほうが良いと思います。
+GitHub APIの制約の関係上一度のリクエストで100件までしか取得出来ないため、本APIは**open状態のissueのうち、最近作成されたissueを最大で100件を返却する**仕様となっています。
+キャッシュの頻度を調整していけば、多少は最大返却数を増やすことができると思います。
 
 
 ### ページングのレスポンスを工夫した
 本APIのクライアントが「次のページが存在するのかどうか」を判断しやすくする目的で、Jsonの返却値としてIssuesのリストの他にhas_next(bool)を返すようにしています。
 
 
-## 改善できる箇所
+## 改善の余地がある箇所
 主に時間の関係で手を入れられなかった、改善が可能な箇所について記述したします。
-* CacheのデータソースをRedisなどに変更する
-* Htmlタグなどが含まれる可能性のある外部サイトからデータを撮ってきているため、ResponseのHeaderとして`X-Content-Type-Options: nosniff`をつけたほうがよい
+* 現在はデフォルト設定でSpring BootのCache機能を使用しているため、ConcurrentHashMap内にキャッシュが保持される。
+  * スケーラビリティなどもう少し実運用を意識する場合には、Redisなどにキャッシュしたほうが良いと思う。
+* Htmlタグなどが含まれる可能性のある外部サイトからデータを撮ってきているため、ResponseのHeaderとして`X-Content-Type-Options: nosniff`をつけたほうがよい。
   * 調査不足だが、Spring Securityなどの機能を使うと一括で当該Headerをレスポンスに加えられるはず。
 * BeanValidationでバリデーションエラーが発生した際に、status: 500エラーとしてレスポンスがかえってしまう。
   * ErrorHandlerなどで、ConstraintViolationExceptionが発生した際の処理を行えば対応可能と思われる。
