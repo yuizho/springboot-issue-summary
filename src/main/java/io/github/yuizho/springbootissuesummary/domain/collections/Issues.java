@@ -14,17 +14,11 @@ public class Issues {
     private static final int DEFAULT_PER_PAGE = 10;
 
     public Issues() {
-        this.issues = new ArrayList<>();
-        this.hasNext = false;
+        this(new ArrayList<>());
     }
 
     public Issues(List<Issue> issues) {
-        this.hasNext = false;
-        if (issues == null) {
-            this.issues = new ArrayList<>();
-            return;
-        }
-        this.issues = issues;
+        this(issues, false);
     }
 
     public Issues(List<Issue> issues, boolean hasNext) {

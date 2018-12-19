@@ -30,6 +30,13 @@ class IssuesTest {
     }
 
     @Test
+    void WhenNullIsPassedToConstructerWorksCorrectly() {
+        var actual = new Issues(null);
+        assertThat(actual.getIssues()).hasSize(0);
+        assertThat(actual.isHasNext()).isFalse();
+    }
+
+    @Test
     void constructorWithListWorksCorrectly() {
         var list = List.of(
                 new Issue("title1", "title1"),
