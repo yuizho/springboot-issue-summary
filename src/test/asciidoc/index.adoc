@@ -1,0 +1,19 @@
+= API Document
+
+[[issues]]
+== Issues
+GitHubからspring-bootプロジェクトのIssue情報を取得し、各Issueの概要情報を返却する。
+
+最大で最新100件のIssue情報を取得可能。
+
+=== Request Parameter
+include::{snippets}/issues/request-parameters.adoc[]
+
+=== Response Fields
+include::{snippets}/issues/response-fields.adoc[]
+
+=== Example request
+include::{snippets}/issues/curl-request.adoc[]
+
+=== Example response
+include::{snippets}/issues/http-response.adoc[]

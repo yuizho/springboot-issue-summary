@@ -9,7 +9,7 @@ Dockerが使用できる環境で実行してください。
 ## サーバの起動
 以下のコマンドを実行して、Dockerコンテナ上でJavaのサーバを起動してください。
 
-※docker image`yuizho/springboot-issue-summary`はDocker Hub(https://cloud.docker.com/repository/docker/yuizho/springboot-issue-summary)へpush済みのものです。
+※docker image [yuizho/springboot-issue-summary](https://cloud.docker.com/repository/docker/yuizho/springboot-issue-summary)はDockerHubへpush済みのものです。
 
 ```bash
 docker run -it --rm -p 8080:8080 yuizho/springboot-issue-summary
@@ -71,7 +71,9 @@ http://localhost:8080/api/issues?page=1&per_page=10
 ```
 
 # 作成したエンドポイントのインターフェース仕様
-TODO: リンクを貼る
+APIのパラメータ、レスポンスのインターフェース仕様については以下のドキュメントをご覧ください。
+
+[IssuesAPIのインターフェース仕様書](api_doc.html)
 
 # 実装の内容について
 ## 使用したJavaバージョン、フレームワークなど
