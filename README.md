@@ -73,7 +73,7 @@ http://localhost:8080/api/issues?page=1&per_page=10
 # 作成したエンドポイントのインターフェース仕様
 APIのパラメータ、レスポンスのインターフェース仕様については以下のドキュメントをご覧ください。
 
-[IssuesAPIのインターフェース仕様書](api_doc.html)
+[IssuesAPIのインターフェース仕様書](api_doc.pdf)
 
 # 実装の内容について
 ## 使用したJavaバージョン、フレームワークなど
