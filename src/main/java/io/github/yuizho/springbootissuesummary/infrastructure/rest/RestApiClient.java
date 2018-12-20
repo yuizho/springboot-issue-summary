@@ -1,7 +1,11 @@
 package io.github.yuizho.springbootissuesummary.infrastructure.rest;
 
+import io.github.yuizho.springbootissuesummary.domain.adopters.LogCollector;
+import io.github.yuizho.springbootissuesummary.domain.models.LogData;
+import io.github.yuizho.springbootissuesummary.infrastructure.LogCollectorProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * The Http Client class of External Rest API.
@@ -20,6 +25,12 @@ import java.time.Duration;
 @Component
 public class RestApiClient {
     private final Logger logger = LoggerFactory.getLogger(RestApiClient.class);
+
+    @Autowired
+    private Map<String, LogCollector> logCollectors;
+
+    @Autowired
+    private LogCollectorProperties logCollectorProperties;
 
     public HttpResponse<String> get(URI uri)
             throws IOException, InterruptedException {
@@ -84,6 +95,8 @@ public class RestApiClient {
     protected HttpResponse<String> send(HttpClient client, HttpRequest request)
             throws IOException, InterruptedException {
         logger.info(request.toString());
+        LogCollector logCollector = logCollectors.get(logCollectorProperties.getName());
+        logCollector.collect(new LogData(getRequestLogStr(request)));
         HttpResponse<String> result
                 = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (!isOK(result.statusCode())) {
@@ -91,7 +104,23 @@ public class RestApiClient {
                     String.format("the status code responded by external API is %d.", result.statusCode()));
         }
         logger.info(result.toString());
+        logCollector.collect(new LogData(getResponseLogStr(result)));
         return result;
+    }
+
+    String getRequestLogStr(HttpRequest request) {
+        return String.format("HtttpRequest(Url: %s, Headers: %s, Body: %s)",
+                request.uri().toString(),
+                request.headers().map(),
+                // TODO: bodyの内容が表示出来ない……
+                request.bodyPublisher().orElse(HttpRequest.BodyPublishers.noBody()));
+    }
+
+    String getResponseLogStr(HttpResponse<String> result) {
+        return String.format("HtttpResponse(Url: %s, Headers: %s, Body: %s)",
+                result.uri().toString(),
+                result.headers().map(),
+                result.body());
     }
 
     /**
