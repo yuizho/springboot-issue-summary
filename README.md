@@ -4,18 +4,20 @@
 
 # 実行手順
 ## 必要環境
-Dockerが使用できる環境で実行してください。
+Docker(docker-composeコマンド)が使用できる環境で実行してください。
 
 ## サーバの起動
-以下のコマンドを実行して、Dockerコンテナ上でJavaのサーバを起動してください。
+以下のコマンドを実行して、Dockerコンテナ上でJavaのAPIサーバ、MongoDB、Mongo Expressを起動してください。
 
 ※docker image [yuizho/springboot-issue-summary](https://cloud.docker.com/repository/docker/yuizho/springboot-issue-summary)はDockerHubへpush済みのものです。
 
 ```bash
-docker run -it --rm -p 8080:8080 yuizho/springboot-issue-summary
+$ git clone https://github.com/yuizho/springboot-issue-summary.git
+$ cd springboot-issue-summary
+$ docker-compose up
 ```
 
-## 動作確認
+## APIの動作確認
 任意のブラウザ、あるいはcurlなどのHttpクライアントツールを使用して、以下のURIへGETでアクセスしてください。
 
 http://localhost:8080/api/issues?page=1&per_page=10
@@ -70,10 +72,20 @@ http://localhost:8080/api/issues?page=1&per_page=10
 }
 ```
 
+## HttpRequest, HttpResponseのログの確認
+HttpRequest, HttpResponseのログはデータストア(MongoDB)へ格納される作りになっています。
+ブラウザから以下のURLへアクセスすると、MongoDB向けのViewerでるMongo Expressを使って格納されたログを確認できます。
+
+http://localhost:8081/db/log/logData
+
+※なお、HttpRequest, HttpResponseのログ**改善の余地がある箇所**の章で記載していますが、HttpRequestのbodyの内容はうまくログ出力出来ていません。
+
+
 # 作成したエンドポイントのインターフェース仕様
 APIのパラメータ、レスポンスのインターフェース仕様については以下のドキュメントをご覧ください。
 
 https://yuizho.github.io/springboot-issue-summary-doc/apidoc/
+
 
 # 実装の内容について
 ## 使用したJavaバージョン、フレームワークなど
@@ -97,7 +109,7 @@ DDD(ドメイン駆動設計)の考え方を取り入れて、クラス設計を
 また、ドメインレイヤーのパッケージ内に、Issueオブジェクトを取得するためのIssuesFetcherインターフェースを定義し、インフラストラクチャーレイヤー内でそのインターフェースを実装するようにしています。
 アプリケーションレイヤーはIssuesFetcherインターフェースを参照しているだけなので、どのデータソースから情報が取得されるのかは知らずにIssuesオブジェクトを取得できるようになっています。
 
-このおかげで、DI機能によるデータソースの切り替えも行いやすくなっています(詳細は**プロパティファイルで取得するデータソースを切り替えられるようにした**をご覧ください)。
+このおかげで、DI機能によるデータソースの切り替えも実装しやすくなっています(詳細は**プロパティファイルで取得するデータソースを切り替えられるようにした**をご覧ください)。
 
 
 ### プロパティファイルで取得するデータソースを切り替えられるようにした
@@ -155,7 +167,9 @@ https://yuizho.github.io/springboot-issue-summary-doc/apidoc/
 ## 改善の余地がある箇所
 主に時間の関係で手を入れられなかった、改善が可能な箇所について記述したします。
 * 現在はデフォルト設定でSpring BootのCache機能を使用しているため、ConcurrentHashMap内にキャッシュが保持される。
-  * スケーラビリティなどもう少し実運用を意識する場合には、Redisなどにキャッシュしたほうが良いと思う。
+  * より実運用を見据えた実装にする場合、Redisなどにキャッシュしたほうが良いと思う。
+* HttpRequestのログについて、bodyの内容が出力出来ていない。
+  * Java 11のHttp Client実装を使用しているのですが、Bodyの情報を格納しているオブジェクト(BodyPublisher)がbodyの内容のtoString出力などに対応していないため。
 * Htmlタグなどが含まれる可能性のある外部サイトからデータを撮ってきているため、ResponseのHeaderとして`X-Content-Type-Options: nosniff`をつけたほうがよい。
   * 調査不足だが、Spring Securityなどの機能を使うと一括で当該Headerをレスポンスに加えられるはず。
 * BeanValidationでバリデーションエラーが発生した際に、status: 500エラーとしてレスポンスがかえってしまう。
