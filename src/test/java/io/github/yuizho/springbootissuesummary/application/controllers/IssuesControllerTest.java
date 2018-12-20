@@ -37,7 +37,7 @@ public class IssuesControllerTest {
     private IssuesService issuesService;
 
     @Test
-    public void shouldReturnDefaultMessage() throws Exception {
+    public void defaultDoc() throws Exception {
         when(issuesService.fetchIssues(any(), any()))
                 .thenReturn(
                             new Issues(List.of(
@@ -51,17 +51,116 @@ public class IssuesControllerTest {
                             requestParameters(
                                     parameterWithName("page")
                                             .optional()
-                                            .description("取得するページ数 (optional, default value: 1, range: 1~100)"),
+                                            .description("取得するページ番号 (省略可能, 型: 数値, デフォルト値: 1, 入力可能範囲: 1~)"),
                                     parameterWithName("per_page")
                                             .optional()
-                                            .description("一度に取得するIssueの数 (optional, default value: 10, range: 1~100)")
+                                            .description("一度に取得するIssueの数 (省略可能, 型: 数値, デフォルト値: 10, 入力可能範囲: 1~)")
                             ),
                             responseFields(
                                     fieldWithPath("has_next").type(JsonFieldType.BOOLEAN).description("次のページが存在する場合はtrue, 次のページが存在しない場合はfalse"),
-                                    fieldWithPath("issues[]").type(JsonFieldType.ARRAY).description("Issue情報の概要のリスト"),
+                                    fieldWithPath("issues[]").type(JsonFieldType.ARRAY)
+                                            .description("Issue情報の概要のリスト。page=101&per_page=1など、パラメータに返却可能なページ数(100)を越えた値が指定された場合、空のリストを返す。"),
                                     fieldWithPath("issues[].title").type(JsonFieldType.STRING).description("Issueのtitle (先頭10文字)"),
                                     fieldWithPath("issues[].body").type(JsonFieldType.STRING).description("Issueのbody (先頭30文字)")
                             )
                         ));
+    }
+
+    @Test
+    public void noParamDoc() throws Exception {
+        when(issuesService.fetchIssues(any(), any()))
+                .thenReturn(
+                        new Issues(List.of(
+                                new Issue("Task input", "BootJar`'s `bootInf` property"),
+                                new Issue("Improve Sp", "We prepared article about migr"),
+                                new Issue("title3", "body3"),
+                                new Issue("title4", "body4"),
+                                new Issue("title5", "body5"),
+                                new Issue("title6", "body6"),
+                                new Issue("title7", "body7"),
+                                new Issue("title8", "body8"),
+                                new Issue("title9", "body9"),
+                                new Issue("title10", "body10")
+                        ), true));
+        this.mockMvc.perform(
+                get("/api/issues").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andDo(document("issues_no_param",
+                        requestParameters(
+                                parameterWithName("page")
+                                        .optional()
+                                        .description(""),
+                                parameterWithName("per_page")
+                                        .optional()
+                                        .description("")
+                        ),
+                        responseFields(
+                                fieldWithPath("has_next").type(JsonFieldType.BOOLEAN).description(""),
+                                fieldWithPath("issues[]").type(JsonFieldType.ARRAY).description(""),
+                                fieldWithPath("issues[].title").type(JsonFieldType.STRING).description(""),
+                                fieldWithPath("issues[].body").type(JsonFieldType.STRING).description("")
+                        )
+                ));
+    }
+
+    @Test
+    public void perPageBiggerThanRamining() throws Exception {
+        when(issuesService.fetchIssues(any(), any()))
+                .thenReturn(
+                        new Issues(List.of(
+                                new Issue("Task input", "BootJar`'s `bootInf` property"),
+                                new Issue("Improve Sp", "We prepared article about migr"),
+                                new Issue("title3", "body3"),
+                                new Issue("title4", "body4"),
+                                new Issue("title5", "body5"),
+                                new Issue("title6", "body6"),
+                                new Issue("title7", "body7"),
+                                new Issue("title8", "body8"),
+                                new Issue("title9", "body9"),
+                                new Issue("title10", "body10")
+                        ), false));
+        this.mockMvc.perform(
+                get("/api/issues?page=4&per_page=30").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andDo(document("issues_bigger_than_remaining",
+                        requestParameters(
+                                parameterWithName("page")
+                                        .optional()
+                                        .description(""),
+                                parameterWithName("per_page")
+                                        .optional()
+                                        .description("")
+                        ),
+                        responseFields(
+                                fieldWithPath("has_next").type(JsonFieldType.BOOLEAN).description(""),
+                                fieldWithPath("issues[]").type(JsonFieldType.ARRAY).description(""),
+                                fieldWithPath("issues[].title").type(JsonFieldType.STRING).description(""),
+                                fieldWithPath("issues[].body").type(JsonFieldType.STRING).description("")
+                        )
+                ));
+    }
+
+    @Test
+    public void exceedsMaxPage() throws Exception {
+        when(issuesService.fetchIssues(any(), any()))
+                .thenReturn(
+                        new Issues(List.of(), false));
+        this.mockMvc.perform(
+                get("/api/issues?page=101&per_page=1").accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andDo(document("issues_exceeds_max",
+                        requestParameters(
+                                parameterWithName("page")
+                                        .optional()
+                                        .description(""),
+                                parameterWithName("per_page")
+                                        .optional()
+                                        .description("")
+                        ),
+                        responseFields(
+                                fieldWithPath("has_next").type(JsonFieldType.BOOLEAN).description(""),
+                                fieldWithPath("issues[]").type(JsonFieldType.ARRAY).description("")
+                        )
+                ));
     }
 }

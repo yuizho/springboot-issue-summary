@@ -17,3 +17,21 @@ include::{snippets}/issues/curl-request.adoc[]
 
 === Example response
 include::{snippets}/issues/http-response.adoc[]
+
+=== Example request (パラメータなし)
+include::{snippets}/issues_no_param/curl-request.adoc[]
+
+=== Example response (パラメータなし)
+include::{snippets}/issues_no_param/http-response.adoc[]
+
+=== Example request (per_pageの値より残りのIssueが少ない場合、残りのIssueをすべて返却する)
+include::{snippets}/issues_bigger_than_remaining/curl-request.adoc[]
+
+=== Example response (per_pageの値より残りのIssuesが少ない場合、残りのIssueをすべて返却する)
+include::{snippets}/issues_bigger_than_remaining/http-response.adoc[]
+
+=== Example request (最大ページ数オーバー)
+include::{snippets}/issues_exceeds_max/curl-request.adoc[]
+
+=== Example response (最大ページ数オーバー)
+include::{snippets}/issues_exceeds_max/http-response.adoc[]
