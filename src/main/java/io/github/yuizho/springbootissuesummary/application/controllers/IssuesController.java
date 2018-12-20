@@ -22,7 +22,6 @@ public class IssuesController {
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Issues getIssues(
-            // TODO: バリデーションエラーが出ると500エラーになるのが気に入らない
             @Min(1) @RequestParam(name = "page", required = false) Integer page,
             @Min(1) @RequestParam(name = "per_page", required = false) Integer perPage) {
         return issuesService.fetchIssues(Optional.ofNullable(page), Optional.ofNullable(perPage));

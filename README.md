@@ -172,5 +172,3 @@ https://yuizho.github.io/springboot-issue-summary-doc/apidoc/
   * Java 11のHttp Client実装を使用しているのですが、Bodyの情報を格納しているオブジェクト(BodyPublisher)がbodyの内容のtoString出力などに対応していないため。
 * Htmlタグなどが含まれる可能性のある外部サイトからデータを撮ってきているため、ResponseのHeaderとして`X-Content-Type-Options: nosniff`をつけたほうがよい。
   * 調査不足だが、Spring Securityなどの機能を使うと一括で当該Headerをレスポンスに加えられるはず。
-* BeanValidationでバリデーションエラーが発生した際に、status: 500エラーとしてレスポンスがかえってしまう。
-  * ErrorHandlerなどで、ConstraintViolationExceptionが発生した際の処理を行えば対応可能と思われる。
