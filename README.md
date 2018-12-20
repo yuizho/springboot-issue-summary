@@ -165,10 +165,11 @@ GitHub APIの制約の関係上一度のリクエストで100件までしか取�
 https://yuizho.github.io/springboot-issue-summary-doc/apidoc/
 
 ## 改善の余地がある箇所
-主に時間の関係で手を入れられなかった、改善が可能な箇所について記述したします。
+主に時間の関係で実施出来なかった・手を入れられなかった、改善が可能な箇所について記述したします。
 * 現在はデフォルト設定でSpring BootのCache機能を使用しているため、ConcurrentHashMap内にキャッシュが保持される。
   * より実運用を見据えた実装にする場合、Redisなどにキャッシュしたほうが良いと思う。
 * HttpRequestのログについて、bodyの内容が出力出来ていない。
   * Java 11のHttp Client実装を使用しているのですが、Bodyの情報を格納しているオブジェクト(BodyPublisher)がbodyの内容のtoString出力などに対応していないため。
 * Htmlタグなどが含まれる可能性のある外部サイトからデータを撮ってきているため、ResponseのHeaderとして`X-Content-Type-Options: nosniff`をつけたほうがよい。
   * 調査不足だが、Spring Securityなどの機能を使うと一括で当該Headerをレスポンスに加えられるはず。
+* ErrorProneなどの静的解析ツールを導入出来なかった。
