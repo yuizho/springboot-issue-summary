@@ -74,7 +74,7 @@ http://localhost:8080/api/issues?page=1&per_page=10
 
 ## HttpRequest, HttpResponseのログの確認
 HttpRequest, HttpResponseのログはデータストア(MongoDB)へ格納される作りになっています。
-ブラウザから以下のURLへアクセスすると、MongoDB向けのViewerでるMongo Expressを使って格納されたログを確認できます。
+ブラウザから以下のURLへアクセスすると、MongoDB向けのViewerであるMongo Expressを使って格納されたログを確認できます。
 
 http://localhost:8081/db/log/logData
 
