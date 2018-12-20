@@ -78,7 +78,7 @@ HttpRequest, HttpResponseのログはデータストア(MongoDB)へ格納され�
 
 http://localhost:8081/db/log/logData
 
-※なお、HttpRequest, HttpResponseのログ**改善の余地がある箇所**の章で記載していますが、HttpRequestのbodyの内容はうまくログ出力出来ていません。
+※なお**改善の余地がある箇所**の章で記載していますが、HttpRequestのbodyの内容はうまくログ出力出来ていません。
 
 
 # 作成したエンドポイントのインターフェース仕様
