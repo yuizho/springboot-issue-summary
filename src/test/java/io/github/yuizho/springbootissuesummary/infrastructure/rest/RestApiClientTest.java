@@ -1,7 +1,14 @@
 package io.github.yuizho.springbootissuesummary.infrastructure.rest;
 
+import io.github.yuizho.springbootissuesummary.domain.adopters.LogCollector;
+import io.github.yuizho.springbootissuesummary.infrastructure.LogCollectorProperties;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 
@@ -9,17 +16,37 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RestApiClientTest {
+    @Mock
+    private Map<String, LogCollector> logCollectors;
+
+    @Mock
+    private LogCollectorProperties logCollectorProperties;
+
+    @InjectMocks
+    private RestApiClient restApiClient;
+
     @Rule
     public MockServerRule mockServerRule = new MockServerRule(this, 1081);
 
     private MockServerClient mockServerClient;
+
+    @Before
+    public void setUp() {
+        when(logCollectorProperties.getName()).thenReturn("MockLogCollector");
+        when(logCollectors.get(anyString())).thenReturn(mock(LogCollector.class));
+    }
 
     @Test
     public void testGet() throws IOException, InterruptedException {
@@ -35,7 +62,6 @@ public class RestApiClientTest {
                                 .withBody("OK")
                 );
 
-        RestApiClient restApiClient = new RestApiClient();
         HttpResponse<String> actual = restApiClient.get(URI.create("http://localhost:1081/test"));
 
         assertThat(actual.statusCode()).isEqualTo(200);
@@ -55,7 +81,6 @@ public class RestApiClientTest {
                                 .withStatusCode(200)
                 );
 
-        RestApiClient restApiClient = new RestApiClient();
         HttpResponse<String> actual = restApiClient.delete(URI.create("http://localhost:1081/test"));
 
         assertThat(actual.statusCode()).isEqualTo(200);
@@ -76,7 +101,6 @@ public class RestApiClientTest {
                                 .withBody("OK")
                 );
 
-        RestApiClient restApiClient = new RestApiClient();
         HttpResponse<String> actual
                 = restApiClient.post(
                         URI.create("http://localhost:1081/test"),
@@ -101,7 +125,6 @@ public class RestApiClientTest {
                                 .withBody("OK")
                 );
 
-        RestApiClient restApiClient = new RestApiClient();
         HttpResponse<String> actual
                 = restApiClient.put(
                 URI.create("http://localhost:1081/test"),
@@ -123,8 +146,6 @@ public class RestApiClientTest {
                         response()
                                 .withStatusCode(404)
                 );
-
-        RestApiClient restApiClient = new RestApiClient();
 
         assertThatThrownBy(() -> restApiClient.get(URI.create("http://localhost:1081/test")))
                 .isInstanceOfSatisfying(IOException.class, e -> {
