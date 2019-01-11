@@ -25,7 +25,7 @@ public class IssuesRestFetcher implements IssuesFetcher {
     @Autowired
     private RestApiClient apiClient;
 
-    @Cacheable(value = DOMAIN_NAME)
+    @Cacheable(value = DOMAIN_NAME, sync = true)
     @Override
     public Issues fetchIssues() {
         try {
